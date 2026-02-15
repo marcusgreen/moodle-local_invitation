@@ -85,6 +85,22 @@ class util {
     }
 
     /**
+     * Get all course roles for invitation form.
+     * Returns all roles that can be assigned in a course context.
+     *
+     * @return array Array of role choices with roleid => rolename
+     */
+    public static function get_invitation_role_choices() {
+        $roles = self::get_roles_for_contextlevel(CONTEXT_COURSE);
+        $guestrole = get_guest_role();
+        $roles[$guestrole->id] = $guestrole; // Add guest role to the list.
+
+        $choices = role_fix_names($roles, null, ROLENAME_ORIGINAL, true);
+
+        return $choices;
+    }
+
+    /**
      * Generate a secret used by an invitation.
      *
      * @return string
@@ -140,6 +156,7 @@ class util {
         $invitation->timestart = $invitedata->timestart;
         $invitation->timeend   = $invitedata->timeend;
         $invitation->maxusers  = $invitedata->maxusers;
+        $invitation->userrole  = $invitedata->userrole;
 
         return $DB->update_record('local_invitation', $invitation);
     }

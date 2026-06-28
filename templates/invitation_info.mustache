@@ -29,6 +29,8 @@
     * timestart
     * timeendwarning
     * timeend
+    * userrolename
+    * systemrolename
     * usedslots
     * freeslots
     * slots
@@ -47,6 +49,8 @@
         "timestart": "2022-02-08 10:00",
         "timeendwarning": 1,
         "timeend": "2022-02-08 12:00",
+        "userrolename": "Student",
+        "systemrolename": "None",
         "usedslots": 12,
         "freeslots": 3,
         "slots": 15,
@@ -103,6 +107,22 @@
                                 </th>
                                 <td {{#timeendwarning}}class="text-danger"{{/timeendwarning}}>
                                     {{timeend}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    {{#str}} role_for_invited_users, local_invitation {{/str}}
+                                </th>
+                                <td>
+                                    {{userrolename}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    {{#str}} role_for_invited_users_system, local_invitation {{/str}}
+                                </th>
+                                <td>
+                                    {{systemrolename}}
                                 </td>
                             </tr>
                             <tr>

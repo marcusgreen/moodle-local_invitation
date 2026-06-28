@@ -4,6 +4,9 @@ moodle-local_invitation
 Changes
 -------
 
+### v5.1.2
+* Select a system role per invitation in addition to the course role.
+
 ### v5.1.1
 * Students could see invitation link.
 * Fix error in delete on logout feature.

@@ -17,6 +17,7 @@
 namespace local_invitation\form;
 
 use local_invitation\helper\date_time as datetime;
+use local_invitation\helper\util;
 
 /**
  * The update form.
@@ -39,9 +40,6 @@ class edit extends base {
         global $CFG;
 
         $this->myconfig = get_config('local_invitation');
-        if (empty($this->myconfig->userrole)) {
-            throw new \moodle_exception('error_userrole_not_defined', 'local_invitation');
-        }
 
         $mform = $this->_form;
 
@@ -58,9 +56,21 @@ class edit extends base {
         $mform->setType('courseid', PARAM_INT);
         $mform->setConstant('courseid', $customdata->courseid);
 
-        $mform->addElement('hidden', 'userrole');
-        $mform->setType('userrole', PARAM_INT);
-        $mform->setConstant('userrole', $this->myconfig->userrole);
+        $roptions = util::get_invitation_role_choices();
+        $mform->addElement('select', 'userrole', get_string('role_for_invited_users', 'local_invitation'), $roptions);
+        if (!empty($customdata->userrole)) {
+            $mform->setDefault('userrole', $customdata->userrole);
+        } else {
+            $mform->setDefault('userrole', $this->myconfig->userrole);
+        }
+
+        $soptions = util::get_invitation_systemrole_choices();
+        $mform->addElement('select', 'systemrole', get_string('role_for_invited_users_system', 'local_invitation'), $soptions);
+        if (isset($customdata->systemrole)) {
+            $mform->setDefault('systemrole', $customdata->systemrole);
+        } else {
+            $mform->setDefault('systemrole', $this->myconfig->systemrole);
+        }
 
         $mform->addElement('text', 'title', get_string('title', 'local_invitation'));
         $mform->addRule('title', null, 'required', null, 'client');

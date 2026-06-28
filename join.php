@@ -88,7 +88,8 @@ if ($confirmdata = $confirmform->get_data()) {
     );
 }
 
-$formwidget = new \local_invitation\output\component\form($confirmform, $title, true);
+$formtitle = !empty($invitation->title) ? format_string($invitation->title) : $title;
+$formwidget = new \local_invitation\output\component\form($confirmform, $formtitle, true);
 $infooutput = '';
 if (isloggedin()) {
     $title      = get_string('note', 'local_invitation');

@@ -77,6 +77,22 @@ class invitation_info extends base {
         $courseurl     = new \moodle_url('/course/view.php', ['id' => $invitation->courseid]);
         $invitationurl = new \moodle_url('/local/invitation/join.php', $urlparams);
 
+        // Resolve the role names assigned by this invitation.
+        $coursecontext = \context_course::instance($invitation->courseid);
+        $courseroles   = role_get_names($coursecontext);
+        $this->data['userrolename'] = isset($courseroles[$invitation->userrole])
+            ? $courseroles[$invitation->userrole]->localname
+            : get_string('none');
+
+        if (!empty($invitation->systemrole)) {
+            $systemroles = role_get_names(\context_system::instance());
+            $this->data['systemrolename'] = isset($systemroles[$invitation->systemrole])
+                ? $systemroles[$invitation->systemrole]->localname
+                : get_string('none');
+        } else {
+            $this->data['systemrolename'] = get_string('none');
+        }
+
         // Set up date format and prepare data for display.
         $dateformat                     = get_string('strftimedatetimeshort');
         $this->data['title']            = $invitation->title ?? get_string('invitation', 'local_invitation');

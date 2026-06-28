@@ -80,6 +80,7 @@ If the invited user calls such url he is redirected to its course or to the Mood
 You should not include the Dashboard or the frontpage in this list!';
 $string['qrcode']                 = 'QR Code';
 $string['role_for_invited_users'] = 'Role for invited users';
+$string['role_for_invited_users_system'] = 'System role for invited users';
 $string['remove_old_invitations'] = 'Remove old users';
 $string['search_or_create_group'] = 'Search or create group';
 $string['show_icon_in_usernavigation'] = 'Show icon in usernavigation';

@@ -64,6 +64,14 @@ class edit extends base {
             $mform->setDefault('userrole', $this->myconfig->userrole);
         }
 
+        $soptions = util::get_invitation_systemrole_choices();
+        $mform->addElement('select', 'systemrole', get_string('role_for_invited_users_system', 'local_invitation'), $soptions);
+        if (isset($customdata->systemrole)) {
+            $mform->setDefault('systemrole', $customdata->systemrole);
+        } else {
+            $mform->setDefault('systemrole', $this->myconfig->systemrole);
+        }
+
         $mform->addElement('text', 'title', get_string('title', 'local_invitation'));
         $mform->addRule('title', null, 'required', null, 'client');
         $mform->setType('title', PARAM_TEXT);

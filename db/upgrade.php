@@ -110,5 +110,24 @@ function xmldb_local_invitation_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025042000, 'local', 'invitation');
     }
 
+    if ($oldversion < 2025042002) {
+        // Define field systemrole to be added to local_invitation.
+        $table = new xmldb_table('local_invitation');
+        $field = new xmldb_field('systemrole', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'userrole');
+
+        // Conditionally launch add field systemrole.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+            // Backfill existing invitations with the current global systemrole so behaviour is unchanged.
+            $mycfg = get_config('local_invitation');
+            if (!empty($mycfg->systemrole)) {
+                $DB->set_field('local_invitation', 'systemrole', $mycfg->systemrole);
+            }
+        }
+
+        // Invitation savepoint reached.
+        upgrade_plugin_savepoint(true, 2025042002, 'local', 'invitation');
+    }
+
     return true;
 }

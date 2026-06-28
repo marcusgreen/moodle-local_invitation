@@ -101,6 +101,21 @@ class util {
     }
 
     /**
+     * Get all system roles for the invitation form.
+     * Returns all roles that can be assigned in a system context, plus a "none" option.
+     *
+     * @return array Array of role choices with roleid => rolename, prepended by 0 => choose
+     */
+    public static function get_invitation_systemrole_choices() {
+        $roles = self::get_roles_for_contextlevel(CONTEXT_SYSTEM);
+
+        $choices = role_fix_names($roles, null, ROLENAME_ORIGINAL, true);
+        $choices = [0 => get_string('choose')] + $choices;
+
+        return $choices;
+    }
+
+    /**
      * Generate a secret used by an invitation.
      *
      * @return string
@@ -155,8 +170,9 @@ class util {
         $invitation->title     = $invitedata->title;
         $invitation->timestart = $invitedata->timestart;
         $invitation->timeend   = $invitedata->timeend;
-        $invitation->maxusers  = $invitedata->maxusers;
-        $invitation->userrole  = $invitedata->userrole;
+        $invitation->maxusers   = $invitedata->maxusers;
+        $invitation->userrole   = $invitedata->userrole;
+        $invitation->systemrole = $invitedata->systemrole;
 
         return $DB->update_record('local_invitation', $invitation);
     }
@@ -258,7 +274,7 @@ class util {
      * @return \stdClass|bool The new user record or false
      */
     public static function create_login_and_enrol($invitation, $confirmdata) {
-        global $DB, $mycfg, $CFG;
+        global $DB, $CFG;
 
         // We don't want to send a welcome message to the dummy user.
         // The only way, I found, to prevent this message, is to remove the coursecontact from the $CFG variable.
@@ -298,8 +314,8 @@ class util {
             }
         }
 
-        if (!empty($mycfg->systemrole)) {
-            role_assign($mycfg->systemrole, $user->id, \context_system::instance());
+        if (!empty($invitation->systemrole)) {
+            role_assign($invitation->systemrole, $user->id, \context_system::instance());
         }
 
         // Log this user in our table.

@@ -66,4 +66,70 @@ final class util_test extends \advanced_testcase {
             $this->assertArrayHasKey($editingteacherrole->id, $rolechoices);
         }
     }
+
+    /**
+     * Test get_invitation_systemrole_choices includes a "none" option and system roles.
+     *
+     * @covers util::get_invitation_systemrole_choices
+     *
+     * @return void
+     */
+    public function test_get_invitation_systemrole_choices(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $rolechoices = util::get_invitation_systemrole_choices();
+
+        // The "none" option (key 0) must always be present.
+        $this->assertArrayHasKey(0, $rolechoices);
+
+        // Standard system-assignable roles should be present (manager is assignable at system level by default).
+        $roles = role_get_names();
+        if (!empty($roles['manager'])) {
+            $this->assertArrayHasKey($roles['manager']->id, $rolechoices);
+        }
+    }
+
+    /**
+     * Test that create_invitation and update_invitation persist the systemrole.
+     *
+     * @covers util::create_invitation
+     * @covers util::update_invitation
+     *
+     * @return void
+     */
+    public function test_invitation_persists_systemrole(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $roles = role_get_names();
+        $studentid = $roles['student']->id;
+        $managerid = $roles['manager']->id;
+
+        // Create an invitation with a system role.
+        $invitedata = new \stdClass();
+        $invitedata->courseid   = $course->id;
+        $invitedata->title      = 'Test invitation';
+        $invitedata->userrole   = $studentid;
+        $invitedata->systemrole = $managerid;
+        $invitedata->maxusers   = 5;
+        $invitedata->timestart  = time();
+        $invitedata->timeend    = time() + DAYSECS;
+
+        $id = util::create_invitation($invitedata);
+        $this->assertNotEmpty($id);
+
+        $record = $DB->get_record('local_invitation', ['id' => $id], '*', MUST_EXIST);
+        $this->assertEquals($managerid, $record->systemrole);
+
+        // Update the invitation to clear the system role (none).
+        $invitedata->systemrole = 0;
+        $this->assertTrue(util::update_invitation($record, $invitedata));
+
+        $record = $DB->get_record('local_invitation', ['id' => $id], '*', MUST_EXIST);
+        $this->assertEquals(0, $record->systemrole);
+    }
 }
